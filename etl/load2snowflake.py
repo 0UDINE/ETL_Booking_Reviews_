@@ -3,9 +3,9 @@ import snowflake.connector
 
 def load2snowflake(transformed_file):
     conn = snowflake.connector.connect(
-        user='OUSSAMAV1',
-        password='Mdpinccorect911',
-        account='qqvnwoh-bn12891',
+        user='******',
+        password='*****',
+        account='*****',
         warehouse='BOOKING_WH',
         database='BOOKING_DB',
         schema='STAGING'
