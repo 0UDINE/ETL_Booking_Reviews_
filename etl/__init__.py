@@ -1,2 +1,3 @@
 from .transform import transform
-from .load2snowflake import load2snowflake
+from .OLAP_modeling import loading2snowflake
+from .OLAP_modeling import olap_modeling

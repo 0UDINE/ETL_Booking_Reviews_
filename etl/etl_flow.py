@@ -5,7 +5,8 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from scraper import scrape_single_threaded
 from etl import transform
-from etl import load2snowflake
+from etl import loading2snowflake
+from etl import olap_modeling
 
 
 @task
@@ -26,8 +27,10 @@ def transform_data():
 @task
 def load_data(transformed_file):
     print(f"Loading data into snowflake :")
-    load2snowflake(transformed_file)
+    loading2snowflake(transformed_file)
     print("Loading completed!")
+    olap_modeling()
+    print("OLAP data model loaded the data successfully")
     return "success"
 
 @flow
