@@ -2,9 +2,9 @@ from snowflake.snowpark import Session
 
 def create_snowflake_session():
     connection_parameters = {
-        "account": "qqvnwoh-bn12891",
-        "user": "OUSSAMAV1",
-        "password": "Mdpinccorect911",
+        "account": "***",
+        "user": "***",
+        "password": "***",
         "role": "ACCOUNTADMIN",
         "warehouse": "BOOKING_WH",
         "database": "BOOKING_DB",
