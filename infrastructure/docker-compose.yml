@@ -1,0 +1,116 @@
+services:
+  postgres:
+    image: postgres:14
+    environment:
+      - POSTGRES_DB=prefect
+      - POSTGRES_USER=prefect
+      - POSTGRES_PASSWORD=prefect_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - prefect-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U prefect"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  prefect-server:
+    image: prefecthq/prefect:2-latest
+    command: |
+      sh -c "
+        echo 'Waiting for database...'
+        sleep 15
+        echo 'Running database migrations...'
+        prefect server database upgrade -y
+        echo 'Starting Prefect server...'
+        prefect server start --host 0.0.0.0 --port 4200
+      "
+    ports:
+      - "4200:4200"
+    networks:
+      - prefect-network
+    environment:
+      - PREFECT_SERVER_API_HOST=0.0.0.0
+      - PREFECT_SERVER_API_PORT=4200
+      - PREFECT_API_URL=http://localhost:4200/api
+      - PREFECT_UI_URL=http://localhost:4200
+      - PREFECT_API_DATABASE_CONNECTION_URL=postgresql+asyncpg://prefect:prefect_password@postgres:5432/prefect
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:4200/api/health" ]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+
+  prefect-worker:
+    image: prefecthq/prefect:2-latest
+    command: |
+      sh -c "
+        echo 'Waiting for Prefect server...'
+        sleep 30
+        echo 'Creating default work pool...'
+        prefect work-pool create default-agent-pool --type process || echo 'Work pool may already exist'
+        echo 'Starting worker...'
+        prefect worker start --pool default-agent-pool --type process
+      "
+    environment:
+      - PREFECT_API_URL=http://prefect-server:4200/api
+    networks:
+      - prefect-network
+    volumes:
+      - .:/opt/prefect/
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - prefect-server
+
+  selenium:
+    image: selenium/standalone-chrome:latest
+    shm_size: '2gb'
+    ports:
+      - "5555:4444"
+    environment:
+      - SE_VNC_NO_PASSWORD=true   # disables password check if VNC runs internally
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4444/wd/hub/status"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+    networks:
+      - prefect-network
+
+
+  etl-pipeline:
+    build:
+      context: ..
+      dockerfile: infrastructure/Dockerfile
+    networks:
+      - prefect-network
+    environment:
+      - PREFECT_API_URL=http://prefect-server:4200/api
+    command: |
+      sh -c "
+        echo 'Waiting for Prefect server...'
+        sleep 50
+        python /opt/prefect/etl/etl_flow.py
+      "
+#    command: tail -f /dev/null
+    volumes:
+      - ../data:/opt/prefect/data
+      - ../etl:/opt/prefect/etl
+      - ../data/raw:/opt/prefect/data/raw # mounting the data/raw dir to have the scraped data in your host machine (locally)
+    depends_on:
+      - prefect-server
+      - selenium
+
+networks:
+  prefect-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  prefect-data:

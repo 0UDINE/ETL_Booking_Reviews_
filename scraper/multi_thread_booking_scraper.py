@@ -3,12 +3,10 @@ import time
 import csv
 import threading
 import uuid
-from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 import os
@@ -16,7 +14,7 @@ from selenium.webdriver.support.ui import Select
 from collections import defaultdict
 import requests
 from datetime import date, timedelta, datetime
-from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from selenium.common.exceptions import TimeoutException
 
 # Global lock for CSV writing
 csv_lock = threading.Lock()
@@ -108,8 +106,8 @@ def scrape_property_urls(urls, max_links=500):
                 print("No cookie consent button found")
 
             # Debug: Save page source to check what we're getting
-            with open('/app/results/debug_page.html', 'w', encoding='utf-8') as f:
-                f.write(driver.page_source[:10000])  # Save first 10k chars for debugging
+            # with open('../results/debug_page.html', 'w', encoding='utf-8') as f:
+            #     f.write(driver.page_source[:10000])  # Save first 10k chars for debugging
 
             # Try multiple selectors for property links
             property_selectors = [
@@ -957,7 +955,8 @@ def scrape_single_threaded(destinations, batch_size=10):
 
     driver = init_driver()
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    filename = f'/app/results/booking_properties_single_{"-".join(destinations).lower()}_{timestamp}.csv'
+    # pwd : opt/prefect
+    filename = f'./data/raw/booking_properties_single_{"-".join(destinations).lower()}_{timestamp}.csv'
 
     batch = []
     processed = 0
@@ -1002,4 +1001,5 @@ if __name__ == "__main__":
     cities = ["Marrakech", "Tangier"]
 
 
-    scrape_booking_properties(cities, num_threads=3, batch_size=5)
+    # scrape_booking_properties(cities, num_threads=3, batch_size=5)
+    scrape_single_threaded(cities, batch_size=5)
