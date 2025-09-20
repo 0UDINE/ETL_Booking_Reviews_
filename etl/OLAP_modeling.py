@@ -1,14 +1,22 @@
+from os import getenv
+
 from snowflake.snowpark import Session
+from dotenv import load_dotenv
+import os
+
 
 def create_snowflake_session():
+    # Load environment variables from .env file
+    load_dotenv()
+
     connection_parameters = {
-        "account": "qqvnwoh-bn12891",
-        "user": "OUSSAMAV1",
-        "password": "Mdpinccorect911",
-        "role": "ACCOUNTADMIN",
-        "warehouse": "BOOKING_WH",
-        "database": "BOOKING_DB",
-        "schema": "STAGING",
+        "account": os.getenv("SNOWFLAKE_ACCOUNT"),
+        "user": os.getenv("SNOWFLAKE_USER"),
+        "password": os.getenv("SNOWFLAKE_PASSWORD"),
+        "role": os.getenv("SNOWFLAKE_ROLE"),
+        "warehouse": os.getenv("SNOWFLAKE_WAREHOUSE"),
+        "database": os.getenv("SNOWFLAKE_DB"),
+        "schema": getenv("SNOWFLAKE_SCHEMA"),
     }
 
     # create the user session so I can run queries

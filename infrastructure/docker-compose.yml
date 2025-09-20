@@ -108,6 +108,30 @@ services:
       - prefect-server
       - selenium
 
+  metabase:
+    image: metabase/metabase:latest
+    container_name: metabase
+    hostname: metabase
+    ports:
+      - "3000:3000"
+    environment:
+      MB_DB_TYPE: snowflake
+      MB_DB_DBNAME: ${SNOWFLAKE_DB}
+      MB_DB_USER: ${SNOWFLAKE_USER}
+      MB_DB_PASS: ${SNOWFLAKE_PASSWORD}
+      MB_DB_HOST: ${SNOWFLAKE_HOST}
+      MB_DB_SCHEMA: ${SNOWFLAKE_SCHEMA}
+      MB_DB_ROLE: ${SNOWFLAKE_ROLE}
+      MB_DB_WAREHOUSE: ${SNOWFLAKE_WAREHOUSE}
+    networks:
+      - prefect-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3000/api/health" ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
 networks:
   prefect-network:
     driver: bridge
