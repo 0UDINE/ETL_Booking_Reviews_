@@ -7,6 +7,7 @@ services:
       - POSTGRES_PASSWORD=prefect_password
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ../init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - prefect-network
     healthcheck:
@@ -115,14 +116,12 @@ services:
     ports:
       - "3000:3000"
     environment:
-      MB_DB_TYPE: snowflake
-      MB_DB_DBNAME: ${SNOWFLAKE_DB}
-      MB_DB_USER: ${SNOWFLAKE_USER}
-      MB_DB_PASS: ${SNOWFLAKE_PASSWORD}
-      MB_DB_HOST: ${SNOWFLAKE_HOST}
-      MB_DB_SCHEMA: ${SNOWFLAKE_SCHEMA}
-      MB_DB_ROLE: ${SNOWFLAKE_ROLE}
-      MB_DB_WAREHOUSE: ${SNOWFLAKE_WAREHOUSE}
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: metabase
+      MB_DB_USER: prefect
+      MB_DB_PASS: prefect_password
+      MB_DB_HOST: postgres
+      MB_DB_PORT: 5432
     networks:
       - prefect-network
     healthcheck:

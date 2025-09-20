@@ -1,5 +1,4 @@
 from os import getenv
-
 from snowflake.snowpark import Session
 from dotenv import load_dotenv
 import os
