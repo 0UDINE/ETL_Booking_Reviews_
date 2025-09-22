@@ -21,8 +21,8 @@ csv_lock = threading.Lock()
 
 # === TESTING LIMITS ===
 # Set these to None or 0 to disable the limits
-TEST_MAX_PROPERTIES = 200  # scrape only first 200 properties
-TEST_MAX_REVIEW_PAGES = 20  # first page + one extra page (click next once)
+TEST_MAX_PROPERTIES = 100
+TEST_MAX_REVIEW_PAGES = 5
 
 
 def init_driver():

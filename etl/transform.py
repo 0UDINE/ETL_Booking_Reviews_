@@ -17,7 +17,7 @@ def transform():
             dfs.append(df)
 
     combined_df = pd.concat(dfs, ignore_index=True)
-    combined_df.to_csv(r'.\data\raw\raw_booking.csv', index=False)
+    combined_df.to_csv(r'./data/raw/raw_booking.csv', index=False)
 
     all_duplicates = combined_df[combined_df.duplicated(keep=False)]
     if not all_duplicates.empty:
@@ -46,8 +46,8 @@ def transform():
     # instead of the corresponding city name.
     #To address this data inconsistency, we will programmatically overwrite the village
     # name with the name of the city for those specific locations
-    combined_df.loc[combined_df.address.str.contains('Marrakech'), 'city'] = 'Marrakech'
-    combined_df.loc[combined_df.address.str.contains('Tangier'), 'city'] = 'Tangier'
+    combined_df.loc[combined_df.address.str.contains('Marrakech',na=False), 'city'] = 'Marrakech'
+    combined_df.loc[combined_df.address.str.contains('Tangier',na=False), 'city'] = 'Tangier'
 
     # Create derived metric
     # Calculating weighted_avg

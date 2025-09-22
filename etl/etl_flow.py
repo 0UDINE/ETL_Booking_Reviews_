@@ -13,7 +13,7 @@ from etl import olap_modeling
 def extract_data():
     print("Starting extraction...")
     cities = ["Marrakech", "Tangier"]
-    # scrape_single_threaded(cities, batch_size=5)
+    #scrape_single_threaded(cities, batch_size=5)
     print("Extraction completed!")
 
 
